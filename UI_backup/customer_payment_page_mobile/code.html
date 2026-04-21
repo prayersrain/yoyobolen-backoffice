@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yoyobolen Payment</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:wght@400;600;700;900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#b15f00",
+                        "primary": "#8d4b00",
+                        "surface-container-high": "#eae8e5",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "surface-dim": "#dcdad7",
+                        "surface-container-highest": "#e5e2df",
+                        "on-tertiary-container": "#fdfcff",
+                        "on-surface": "#1c1c1a",
+                        "background": "#fcf9f6",
+                        "on-tertiary-fixed": "#001d32",
+                        "surface-container": "#f0edea",
+                        "tertiary-fixed": "#cee5ff",
+                        "inverse-primary": "#ffb77d",
+                        "secondary-fixed": "#d5e3fc",
+                        "tertiary-fixed-dim": "#96ccff",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f6f3f0",
+                        "primary-fixed-dim": "#ffb77d",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#31302f",
+                        "on-primary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#004a75",
+                        "surface-variant": "#e5e2df",
+                        "on-primary-fixed-variant": "#6e3900",
+                        "tertiary": "#006096",
+                        "secondary-container": "#d5e3fc",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "surface": "#fcf9f6",
+                        "on-surface-variant": "#554336",
+                        "secondary": "#515f74",
+                        "outline": "#887364",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#dbc2b0",
+                        "inverse-on-surface": "#f3f0ed",
+                        "primary-fixed": "#ffdcc3",
+                        "on-primary-fixed": "#2f1500",
+                        "on-secondary-container": "#57657a",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#fcf9f6",
+                        "on-background": "#1c1c1a",
+                        "surface-tint": "#904d00",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#007abd",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Noto Serif", "serif"],
+                        "body": ["Inter", "sans-serif"],
+                        "label": ["Inter", "sans-serif"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(252, 249, 246, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .gradient-btn {
+            background: linear-gradient(135deg, #8d4b00 0%, #b15f00 100%);
+        }
+        .shadow-ambient {
+            box-shadow: 0 20px 40px rgba(85, 67, 54, 0.08);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body min-h-screen flex flex-col items-center py-8 px-4 md:px-8">
+<main class="w-full max-w-md mx-auto flex flex-col gap-6">
+<!-- Header -->
+<header class="text-center mb-4">
+<h1 class="font-headline font-black italic text-3xl text-primary mb-1">Yoyobolen</h1>
+<p class="font-label text-sm text-on-surface-variant uppercase tracking-[0.05em]">Secure Checkout</p>
+</header>
+<!-- Main Payment Card -->
+<div class="bg-surface-container-lowest rounded-xl shadow-ambient p-6 flex flex-col items-center gap-6 relative overflow-hidden">
+<!-- decorative top bar -->
+<div class="absolute top-0 left-0 w-full h-2 bg-primary"></div>
+<!-- Status Indicator (Pending) -->
+<div class="inline-flex items-center gap-2 bg-secondary-container px-4 py-2 rounded-full text-sm font-label font-medium text-on-secondary-container">
+<span class="material-symbols-outlined text-[18px]">pending_actions</span>
+<span>Waiting for Payment</span>
+</div>
+<!-- Order Summary -->
+<div class="text-center w-full pb-6 border-b border-surface-variant/30">
+<p class="font-label text-sm text-on-surface-variant mb-1">Order #YB-8492</p>
+<h2 class="font-headline font-bold text-4xl text-on-surface">Rp 125.000</h2>
+</div>
+<!-- QRIS Section -->
+<div class="flex flex-col items-center gap-4 w-full">
+<p class="font-label text-sm text-on-surface-variant text-center">Scan with any QRIS supported app</p>
+<div class="bg-white p-4 rounded-xl border border-surface-variant/50 shadow-sm">
+<!-- Placeholder for QR Code Image -->
+<img alt="QRIS Code" class="w-48 h-48 object-cover rounded-lg mix-blend-multiply opacity-80 filter grayscale" data-alt="A clean, high-contrast placeholder square that resembles a standard black and white QR code matrix on a stark white background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCn23ucgzS0SZ-f9QnCCFi6rjeFAxfT-g1goxYH27lxKpiLKAPOOw_qHzBhMuUFCxu73pdfFGz2BUO5IWfrb7gUrtNNZksFahCirl4hmXSX4mvy4C7KNyOSCa59zS1dx0cdaZwZyHWzdeNrRN5ROTYs5p3yKok_PWT722ux1kIJG_KrIrVV-E4ISQ7q1GE3fBzI9grw_xe7g2fmWA_Vx7YBgYC2M4mUkqpsPxIfhV_57wT9glLiRJ7HYtKOCaE-iEWibd0RwawvmJiZ"/>
+</div>
+<img alt="Supported Payment Methods" class="h-6 object-contain opacity-60" data-alt="Small horizontal row of various indonesian e-wallet and banking logos neatly arranged" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCk6PrmQrfDQ5ZFEH0UPXqudjVayj66er2_PvipksfMvc6J2NewZVyYbG7wnYgcWauxk9rgmkkAzFQSjmeUMGL2DMr_0SZv7NHBoFRPfQd4f9-KW9qUzFJIfvDBCWVb-XMs-tD0XXONtSlMiMrwBi6khlvmPx1VNRNVyEVy3G5w6Oj_sSGwfEwGqgprCebQfXDQGxxbxKzIR9f0gH1zUYaB6CckpmoHKmpv69vdGmnJBBGpTcdMrc5lclz81AGrYBCUr1Y4rVUv5BcJ"/>
+</div>
+<!-- Timer -->
+<div class="w-full bg-surface-container py-4 px-6 rounded-lg flex justify-between items-center mt-2">
+<div class="flex items-center gap-2 text-on-surface-variant">
+<span class="material-symbols-outlined text-primary text-[20px]">timer</span>
+<span class="font-label text-sm">Expires in</span>
+</div>
+<span class="font-body font-bold text-lg text-primary">14:59</span>
+</div>
+<!-- Action Buttons -->
+<div class="w-full flex flex-col gap-3 mt-2">
+<button class="w-full gradient-btn text-on-primary py-3 rounded-lg font-label font-medium transition-opacity hover:opacity-90 active:scale-[0.98]">
+                    I Have Paid
+                </button>
+<button class="w-full bg-transparent text-primary py-3 rounded-lg font-label font-medium hover:bg-surface-container transition-colors">
+                    Cancel Order
+                </button>
+</div>
+</div>
+<!-- Success State Example (Hidden by default in a real app, shown here for design reference) -->
+<div class="mt-8">
+<p class="text-xs text-on-surface-variant text-center mb-4 uppercase tracking-widest">Preview: Success State</p>
+<div class="bg-surface-container-lowest rounded-xl shadow-ambient p-8 flex flex-col items-center gap-4 text-center">
+<div class="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-2">
+<span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<h3 class="font-headline font-bold text-2xl text-on-surface">Payment Successful</h3>
+<p class="font-body text-sm text-on-surface-variant">Thank you! Your payment of Rp 125.000 for Order #YB-8492 has been received.</p>
+<button class="mt-4 bg-surface-container-highest text-primary py-2 px-6 rounded-lg font-label font-medium hover:bg-surface-container transition-colors">
+                    View Receipt
+                </button>
+</div>
+</div>
+</main>
+<footer class="mt-auto pt-8 pb-4 text-center">
+<p class="font-label text-xs text-on-surface-variant flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px]">lock</span>
+            Secured by Artisanal Ledger Payments
+        </p>
+</footer>
+</body></html>

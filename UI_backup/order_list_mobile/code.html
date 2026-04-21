@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yoyobolen Back Office - Order List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400..900;1,400..900&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "primary-container": "#b15f00",
+                    "primary": "#8d4b00",
+                    "surface-container-high": "#eae8e5",
+                    "on-secondary-fixed-variant": "#3a485b",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed": "#0d1c2e",
+                    "surface-dim": "#dcdad7",
+                    "surface-container-highest": "#e5e2df",
+                    "on-tertiary-container": "#fdfcff",
+                    "on-surface": "#1c1c1a",
+                    "background": "#fcf9f6",
+                    "on-tertiary-fixed": "#001d32",
+                    "surface-container": "#f0edea",
+                    "tertiary-fixed": "#cee5ff",
+                    "inverse-primary": "#ffb77d",
+                    "secondary-fixed": "#d5e3fc",
+                    "tertiary-fixed-dim": "#96ccff",
+                    "error-container": "#ffdad6",
+                    "surface-container-low": "#f6f3f0",
+                    "primary-fixed-dim": "#ffb77d",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-surface": "#31302f",
+                    "on-primary-container": "#fffbff",
+                    "on-tertiary-fixed-variant": "#004a75",
+                    "surface-variant": "#e5e2df",
+                    "on-primary-fixed-variant": "#6e3900",
+                    "tertiary": "#006096",
+                    "secondary-container": "#d5e3fc",
+                    "secondary-fixed-dim": "#b9c7df",
+                    "surface": "#fcf9f6",
+                    "on-surface-variant": "#554336",
+                    "secondary": "#515f74",
+                    "outline": "#887364",
+                    "on-primary": "#ffffff",
+                    "outline-variant": "#dbc2b0",
+                    "inverse-on-surface": "#f3f0ed",
+                    "primary-fixed": "#ffdcc3",
+                    "on-primary-fixed": "#2f1500",
+                    "on-secondary-container": "#57657a",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "surface-bright": "#fcf9f6",
+                    "on-background": "#1c1c1a",
+                    "surface-tint": "#904d00",
+                    "on-tertiary": "#ffffff",
+                    "tertiary-container": "#007abd",
+                    "on-error": "#ffffff"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": [
+                            "Noto Serif"
+                    ],
+                    "body": [
+                            "Inter"
+                    ],
+                    "label": [
+                            "Inter"
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col">
+<!-- Mobile Top Header -->
+<header class="sticky top-0 z-50 bg-surface/90 backdrop-blur-md px-4 py-4 flex justify-between items-center shadow-sm shadow-surface-variant/30">
+<div class="flex items-center gap-3">
+<h1 class="font-headline font-bold text-xl text-primary">Orders</h1>
+</div>
+<div class="flex items-center gap-2">
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[24px]">search</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:text-primary transition-colors rounded-full hover:bg-surface-container-highest">
+<span class="material-symbols-outlined text-[24px]">filter_list</span>
+</button>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 px-4 py-6 pb-24 space-y-4">
+<!-- Summary/Filter Pills -->
+<div class="flex overflow-x-auto gap-2 pb-2 scrollbar-hide -mx-4 px-4">
+<button class="shrink-0 px-4 py-2 rounded-full bg-secondary-container text-on-secondary-container font-label text-sm font-medium">All (42)</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-label text-sm font-medium">Pending (12)</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-label text-sm font-medium">Baking (8)</button>
+<button class="shrink-0 px-4 py-2 rounded-full bg-surface-container-highest text-on-surface-variant font-label text-sm font-medium">Ready (22)</button>
+</div>
+<!-- Order Cards List -->
+<div class="space-y-4">
+<!-- Card 1 -->
+<article class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_20px_rgba(85,67,54,0.04)] relative overflow-hidden flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-xs tracking-wider text-on-surface-variant mb-1 block uppercase">#ORD-0892</span>
+<h2 class="font-headline font-semibold text-lg text-on-surface">Eleanor Vance</h2>
+</div>
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-lg font-label text-xs font-bold uppercase tracking-wider">In Progress</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm font-body">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Pickup: Today, 3:00 PM</span>
+</div>
+<div class="mt-2 pt-3 border-t border-surface-variant/20 flex justify-between items-center">
+<div class="text-on-surface-variant text-sm">
+                        3 items
+                    </div>
+<div class="font-headline font-bold text-lg text-primary">
+                        $45.50
+                    </div>
+</div>
+</article>
+<!-- Card 2 -->
+<article class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_20px_rgba(85,67,54,0.04)] relative overflow-hidden flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-xs tracking-wider text-on-surface-variant mb-1 block uppercase">#ORD-0891</span>
+<h2 class="font-headline font-semibold text-lg text-on-surface">Marcus Thorne</h2>
+</div>
+<span class="px-3 py-1 bg-primary/10 text-primary rounded-lg font-label text-xs font-bold uppercase tracking-wider">Completed</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm font-body">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Picked up: 11:30 AM</span>
+</div>
+<div class="mt-2 pt-3 border-t border-surface-variant/20 flex justify-between items-center">
+<div class="text-on-surface-variant text-sm">
+                        1 item
+                    </div>
+<div class="font-headline font-bold text-lg text-primary">
+                        $12.00
+                    </div>
+</div>
+</article>
+<!-- Card 3 -->
+<article class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_20px_rgba(85,67,54,0.04)] relative overflow-hidden flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-xs tracking-wider text-on-surface-variant mb-1 block uppercase">#ORD-0890</span>
+<h2 class="font-headline font-semibold text-lg text-on-surface">Sophia Rossi</h2>
+</div>
+<span class="px-3 py-1 bg-surface-container-highest text-on-surface-variant rounded-lg font-label text-xs font-bold uppercase tracking-wider">Pending</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm font-body">
+<span class="material-symbols-outlined text-[16px]">calendar_today</span>
+<span>Pickup: Tomorrow, 9:00 AM</span>
+</div>
+<div class="mt-2 pt-3 border-t border-surface-variant/20 flex justify-between items-center">
+<div class="text-on-surface-variant text-sm">
+                        5 items
+                    </div>
+<div class="font-headline font-bold text-lg text-primary">
+                        $89.00
+                    </div>
+</div>
+</article>
+<!-- Card 4 -->
+<article class="bg-surface-container-lowest rounded-xl p-5 shadow-[0_4px_20px_rgba(85,67,54,0.04)] relative overflow-hidden flex flex-col gap-3">
+<div class="flex justify-between items-start">
+<div>
+<span class="font-label text-xs tracking-wider text-on-surface-variant mb-1 block uppercase">#ORD-0889</span>
+<h2 class="font-headline font-semibold text-lg text-on-surface">Julian Black</h2>
+</div>
+<span class="px-3 py-1 bg-tertiary/10 text-tertiary rounded-lg font-label text-xs font-bold uppercase tracking-wider">In Progress</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface-variant text-sm font-body">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+<span>Pickup: Today, 5:00 PM</span>
+</div>
+<div class="mt-2 pt-3 border-t border-surface-variant/20 flex justify-between items-center">
+<div class="text-on-surface-variant text-sm">
+                        2 items
+                    </div>
+<div class="font-headline font-bold text-lg text-primary">
+                        $28.75
+                    </div>
+</div>
+</article>
+</div>
+</main>
+<!-- Mobile Bottom Navigation (Simulated) -->
+<nav class="fixed bottom-0 w-full bg-surface-container-lowest border-t-0 shadow-[0_-4px_20px_rgba(85,67,54,0.06)] pb-safe">
+<div class="flex justify-around items-center py-2 px-2">
+<button class="flex flex-col items-center p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">dashboard</span>
+<span class="font-label text-[10px] mt-1">Dashboard</span>
+</button>
+<button class="flex flex-col items-center p-2 text-primary font-bold bg-surface-container/50 rounded-lg">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">shopping_cart</span>
+<span class="font-label text-[10px] mt-1">Orders</span>
+</button>
+<button class="flex flex-col items-center p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">bakery_dining</span>
+<span class="font-label text-[10px] mt-1">Products</span>
+</button>
+<button class="flex flex-col items-center p-2 text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[24px]">group</span>
+<span class="font-label text-[10px] mt-1">Customers</span>
+</button>
+</div>
+</nav>
+</body></html>

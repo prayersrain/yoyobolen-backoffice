@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Yoyobolen Back Office - Login</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary": "#ffffff",
+                        "tertiary-container": "#007abd",
+                        "surface-container-lowest": "#ffffff",
+                        "on-tertiary": "#ffffff",
+                        "primary-fixed-dim": "#ffb77d",
+                        "primary-container": "#b15f00",
+                        "surface-tint": "#904d00",
+                        "outline-variant": "#dbc2b0",
+                        "on-error": "#ffffff",
+                        "inverse-primary": "#ffb77d",
+                        "on-tertiary-fixed": "#001d32",
+                        "surface-container-highest": "#e5e2df",
+                        "primary-fixed": "#ffdcc3",
+                        "error": "#ba1a1a",
+                        "surface-container-low": "#f6f3f0",
+                        "background": "#fcf9f6",
+                        "secondary-container": "#d5e3fc",
+                        "outline": "#887364",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "tertiary": "#006096",
+                        "secondary": "#515f74",
+                        "inverse-on-surface": "#f3f0ed",
+                        "tertiary-fixed-dim": "#96ccff",
+                        "surface-variant": "#e5e2df",
+                        "on-primary-fixed": "#2f1500",
+                        "primary": "#8d4b00",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed": "#cee5ff",
+                        "surface": "#fcf9f6",
+                        "surface-container": "#f0edea",
+                        "surface-dim": "#dcdad7",
+                        "surface-container-high": "#eae8e5",
+                        "surface-bright": "#fcf9f6",
+                        "on-background": "#1c1c1a",
+                        "inverse-surface": "#31302f",
+                        "on-tertiary-fixed-variant": "#004a75",
+                        "on-surface": "#1c1c1a",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "secondary-fixed": "#d5e3fc",
+                        "on-secondary-container": "#57657a",
+                        "on-primary-container": "#fffbff",
+                        "error-container": "#ffdad6",
+                        "on-primary-fixed-variant": "#6e3900",
+                        "on-tertiary-container": "#fdfcff",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "on-surface-variant": "#554336"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": [
+                            "Noto Serif"
+                        ],
+                        "body": [
+                            "Inter"
+                        ],
+                        "label": [
+                            "Inter"
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body min-h-screen flex flex-col antialiased relative">
+<!-- TopAppBar Suppressed as per Semantic Shell Mandate (Transactional page) -->
+<!-- Main Content Canvas -->
+<main class="flex-grow flex items-center justify-center p-6 relative z-10">
+<!-- Background Ambient Element -->
+<div class="absolute inset-0 z-[-1] overflow-hidden pointer-events-none opacity-20">
+<div class="absolute top-0 left-0 w-full h-full bg-surface-container"></div>
+<div class="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] rounded-full bg-gradient-to-br from-primary-fixed to-transparent opacity-30 blur-[100px]"></div>
+<div class="absolute -bottom-[20%] -right-[10%] w-[60%] h-[60%] rounded-full bg-gradient-to-tl from-secondary-fixed to-transparent opacity-30 blur-[100px]"></div>
+</div>
+<div class="w-full max-w-md">
+<!-- Logo Cluster -->
+<div class="text-center mb-10">
+<h1 class="text-3xl font-headline italic text-primary tracking-tight">Yoyobolen</h1>
+<p class="mt-2 text-on-surface-variant font-label text-sm uppercase tracking-[0.1em] opacity-80">Artisanal Ledger</p>
+</div>
+<!-- Login Card -->
+<div class="bg-surface-container-lowest rounded-xl p-8 sm:p-10 shadow-[0_20px_40px_rgba(85,67,54,0.08)] relative overflow-hidden group">
+<!-- Card Inner Highlight -->
+<div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-primary to-primary-container opacity-80"></div>
+<div class="mb-8">
+<h2 class="text-2xl font-headline text-on-surface mb-2">Welcome Back, Master Baker</h2>
+<p class="text-on-surface-variant font-body text-sm leading-relaxed">Access your inventory, orders, and recipes to continue crafting perfection.</p>
+</div>
+<form action="#" class="space-y-6" method="POST">
+<!-- Email Input -->
+<div>
+<label class="block text-sm font-label text-on-surface-variant mb-1.5" for="email">Email address</label>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">mail</span>
+</div>
+<input autocomplete="email" class="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg bg-surface-container-low text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all duration-200" id="email" name="email" placeholder="baker@yoyobolen.com" required="" type="email"/>
+</div>
+</div>
+<!-- Password Input -->
+<div>
+<div class="flex items-center justify-between mb-1.5">
+<label class="block text-sm font-label text-on-surface-variant" for="password">Password</label>
+<a class="text-sm font-label text-primary hover:text-primary-container transition-colors duration-200" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-on-surface-variant text-lg">lock</span>
+</div>
+<input autocomplete="current-password" class="block w-full pl-10 pr-10 py-2.5 border-none rounded-lg bg-surface-container-low text-on-surface focus:ring-2 focus:ring-primary/20 focus:bg-surface-container-lowest transition-all duration-200" id="password" name="password" placeholder="••••••••" required="" type="password"/>
+<button class="absolute inset-y-0 right-0 pr-3 flex items-center text-on-surface-variant hover:text-on-surface transition-colors" type="button">
+<span class="material-symbols-outlined text-lg">visibility_off</span>
+</button>
+</div>
+</div>
+<!-- Remember Me -->
+<div class="flex items-center">
+<input class="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary/20 bg-surface-container-low cursor-pointer" id="remember-me" name="remember-me" type="checkbox"/>
+<label class="ml-2 block text-sm font-label text-on-surface-variant cursor-pointer" for="remember-me">
+                            Remember me on this device
+                        </label>
+</div>
+<!-- Submit Action -->
+<div class="pt-2">
+<button class="w-full flex justify-center py-3 px-4 rounded-lg text-sm font-label text-on-primary bg-gradient-to-br from-primary to-primary-container hover:from-primary-container hover:to-[#7a4100] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-primary transition-all duration-300 shadow-sm" type="submit">
+                            Sign In to Dashboard
+                        </button>
+</div>
+</form>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-stone-50 dark:bg-stone-950 docked full-width bottom-0 z-20">
+<div class="bg-stone-200/50 dark:bg-stone-800/50">
+<div class="flex flex-col md:flex-row justify-between items-center px-12 py-8 w-full max-w-7xl mx-auto flat">
+<p class="font-['Inter'] text-sm tracking-wide text-stone-500 dark:text-stone-500 mb-4 md:mb-0">
+                    © 2024 Yoyobolen Artisanal Ledger. All rights reserved.
+                </p>
+<div class="flex space-x-6">
+<a class="font-['Inter'] text-sm tracking-wide text-stone-500 dark:text-stone-500 hover:text-[#8d4b00] underline decoration-[#8d4b00]/30 opacity-80 hover:opacity-100 transition-all" href="#">Privacy Policy</a>
+<a class="font-['Inter'] text-sm tracking-wide text-stone-500 dark:text-stone-500 hover:text-[#8d4b00] underline decoration-[#8d4b00]/30 opacity-80 hover:opacity-100 transition-all" href="#">Terms of Service</a>
+<a class="font-['Inter'] text-sm tracking-wide text-stone-500 dark:text-stone-500 hover:text-[#8d4b00] underline decoration-[#8d4b00]/30 opacity-80 hover:opacity-100 transition-all" href="#">Security Architecture</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

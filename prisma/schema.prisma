@@ -1,0 +1,73 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Product {
+  id          String      @id @default(cuid())
+  name        String
+  category    String      // Kue Kering, Roti, Pastry, Cake, Dessert
+  price       Decimal     @db.Decimal(12, 2)
+  stock       Int         @default(0)
+  imageUrl    String?
+  description String?
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Customer {
+  id            String    @id @default(cuid())
+  name          String
+  email         String?   @unique
+  phone         String    @unique
+  isBlacklisted Boolean   @default(false)
+  blacklistNote String?
+  orders        Order[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Order {
+  id            String      @id @default(cuid())
+  customer      Customer    @relation(fields: [customerId], references: [id])
+  customerId    String
+  totalAmount   Decimal     @db.Decimal(12, 2)
+  status        OrderStatus @default(PENDING)
+  channel       String      // Storefront, WhatsApp, TikTok, Shopee
+  paymentMethod String      @default("QRIS") // QRIS, Transfer, etc.
+  snapToken     String?     // Midtrans Snap Token
+  snapUrl       String?     // Midtrans Snap Redirect URL
+  items         OrderItem[]
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+}
+
+model OrderItem {
+  id        String  @id @default(cuid())
+  order     Order   @relation(fields: [orderId], references: [id])
+  orderId   String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  quantity  Int
+  subtotal  Decimal @db.Decimal(12, 2)
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CANCELLED
+  EXPIRED
+}
+
+model LoginAttempt {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  ipAddress    String?
+  attemptCount Int       @default(0)
+  lastAttempt  DateTime  @default(now())
+  lockUntil    DateTime?
+}

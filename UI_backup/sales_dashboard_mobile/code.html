@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Sales Dashboard - The Artisanal Ledger</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=Noto+Serif:ital,wght@0,400;0,600;0,700;0,900;1,400;1,900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config injected as required -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-container": "#b15f00",
+                        "primary": "#8d4b00",
+                        "surface-container-high": "#eae8e5",
+                        "on-secondary-fixed-variant": "#3a485b",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed": "#0d1c2e",
+                        "surface-dim": "#dcdad7",
+                        "surface-container-highest": "#e5e2df",
+                        "on-tertiary-container": "#fdfcff",
+                        "on-surface": "#1c1c1a",
+                        "background": "#fcf9f6",
+                        "on-tertiary-fixed": "#001d32",
+                        "surface-container": "#f0edea",
+                        "tertiary-fixed": "#cee5ff",
+                        "inverse-primary": "#ffb77d",
+                        "secondary-fixed": "#d5e3fc",
+                        "tertiary-fixed-dim": "#96ccff",
+                        "error-container": "#ffdad6",
+                        "surface-container-low": "#f6f3f0",
+                        "primary-fixed-dim": "#ffb77d",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-surface": "#31302f",
+                        "on-primary-container": "#fffbff",
+                        "on-tertiary-fixed-variant": "#004a75",
+                        "surface-variant": "#e5e2df",
+                        "on-primary-fixed-variant": "#6e3900",
+                        "tertiary": "#006096",
+                        "secondary-container": "#d5e3fc",
+                        "secondary-fixed-dim": "#b9c7df",
+                        "surface": "#fcf9f6",
+                        "on-surface-variant": "#554336",
+                        "secondary": "#515f74",
+                        "outline": "#887364",
+                        "on-primary": "#ffffff",
+                        "outline-variant": "#dbc2b0",
+                        "inverse-on-surface": "#f3f0ed",
+                        "primary-fixed": "#ffdcc3",
+                        "on-primary-fixed": "#2f1500",
+                        "on-secondary-container": "#57657a",
+                        "error": "#ba1a1a",
+                        "on-error-container": "#93000a",
+                        "surface-bright": "#fcf9f6",
+                        "on-background": "#1c1c1a",
+                        "surface-tint": "#904d00",
+                        "on-tertiary": "#ffffff",
+                        "tertiary-container": "#007abd",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {},
+                    "fontFamily": {
+                        "headline": [
+                            "Noto Serif"
+                        ],
+                        "body": [
+                            "Inter"
+                        ],
+                        "label": [
+                            "Inter"
+                        ]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .icon-fill {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Gradient for Primary Button / CTA */
+        .bg-gradient-primary {
+            background: linear-gradient(135deg, #8d4b00 0%, #b15f00 100%);
+        }
+        /* Custom Ambient Shadow from Design System */
+        .shadow-ambient {
+            box-shadow: 0 20px 40px rgba(85, 67, 54, 0.08);
+        }
+        /* Custom Focus Ring */
+        .focus-ring-glow:focus-within {
+            box-shadow: 0 0 0 2px rgba(141, 75, 0, 0.2);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen pb-8">
+<!-- TopAppBar Component (Rendered strictly from JSON directives) -->
+<!-- Applying style_component_shape, style_bg_color, style_typography, style_separation_logic, style_shadows_and_elevation, style_interactions, style_shell_layout -->
+<header class="full-width top-0 sticky bg-[#fcf9f6]/80 dark:bg-stone-950/80 backdrop-blur-md font-['Noto_Serif'] font-semibold text-stone-900 bg-stone-50 dark:bg-stone-900 shadow-sm shadow-stone-200/50 dark:shadow-none opacity-90 hover:opacity-100 transition-opacity flex justify-between items-center w-full px-8 py-4 z-50">
+<!-- Mobile Navigation Trigger (Hamburger) & Brand Logo -->
+<div class="flex items-center gap-4">
+<!-- Hamburger replacing 'search_bar: on_left' conceptually for mobile access to SideNav -->
+<button aria-label="Open menu" class="p-2 -ml-2 text-stone-500 hover:text-amber-700 transition-colors">
+<span class="material-symbols-outlined">menu</span>
+</button>
+<!-- Applying style_brand_logo -->
+<span class="text-xl font-['Noto_Serif'] font-bold text-amber-900 dark:text-amber-500">The Artisanal Ledger</span>
+</div>
+<!-- Trailing Actions (from trailing_icon_actions array) -->
+<div class="flex items-center gap-4">
+<!-- Applying style_inactive_navigation and style_universal_hover -->
+<button class="text-stone-500 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-400 transition-colors flex items-center justify-center min-w-[44px] min-h-[44px]">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="text-stone-500 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-400 transition-colors flex items-center justify-center min-w-[44px] min-h-[44px] hidden sm:flex">
+<span class="material-symbols-outlined">history</span>
+</button>
+<button class="text-stone-500 dark:text-stone-400 hover:text-amber-700 dark:hover:text-amber-400 transition-colors flex items-center justify-center min-w-[44px] min-h-[44px]">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-md mx-auto w-full px-4 pt-6 pb-20 flex flex-col gap-8">
+<!-- Page Header (Editorial Signature) -->
+<header class="flex flex-col gap-1">
+<span class="font-label text-sm uppercase tracking-[0.05em] text-on-surface-variant font-medium">Dashboard Overview</span>
+<h1 class="font-headline text-3xl font-bold text-primary tracking-tight">Today's Sales</h1>
+</header>
+<!-- Stacked Stat Cards (Tonal Layering Principle) -->
+<section class="bg-surface-container-low rounded-xl p-4 flex flex-col gap-4">
+<!-- Primary Stat Card -->
+<div class="bg-surface-container-lowest rounded-lg p-5 shadow-ambient flex flex-col relative overflow-hidden group">
+<!-- Subtle decorative background shape -->
+<div class="absolute -right-6 -top-6 w-24 h-24 bg-primary-container opacity-5 rounded-full blur-xl group-hover:scale-110 transition-transform duration-500"></div>
+<div class="flex justify-between items-start mb-4 relative z-10">
+<div>
+<p class="font-label text-sm text-on-surface-variant mb-1 font-medium">Total Revenue</p>
+<h2 class="font-headline text-3xl font-bold text-on-surface tracking-tight">$4,285.50</h2>
+</div>
+<div class="bg-secondary-container text-on-secondary-container w-10 h-10 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-xl">account_balance_wallet</span>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-auto relative z-10">
+<span class="bg-surface-container-high text-primary px-2 py-1 rounded text-xs font-semibold flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">arrow_upward</span>
+                        12.5%
+                    </span>
+<span class="font-body text-xs text-on-surface-variant">vs. yesterday</span>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<!-- Secondary Stat Card A -->
+<div class="bg-surface-container-lowest rounded-lg p-4 shadow-ambient flex flex-col justify-between min-h-[120px]">
+<div class="flex justify-between items-start">
+<p class="font-label text-xs text-on-surface-variant font-medium">Orders</p>
+<span class="material-symbols-outlined text-tertiary text-lg">receipt_long</span>
+</div>
+<div>
+<p class="font-headline text-2xl font-bold text-on-surface">142</p>
+<p class="font-body text-xs text-on-surface-variant mt-1">+8 this hour</p>
+</div>
+</div>
+<!-- Secondary Stat Card B -->
+<div class="bg-surface-container-lowest rounded-lg p-4 shadow-ambient flex flex-col justify-between min-h-[120px]">
+<div class="flex justify-between items-start">
+<p class="font-label text-xs text-on-surface-variant font-medium">Avg. Value</p>
+<span class="material-symbols-outlined text-outline text-lg">shopping_basket</span>
+</div>
+<div>
+<p class="font-headline text-2xl font-bold text-on-surface">$30.18</p>
+<p class="font-body text-xs text-on-surface-variant mt-1">Stable</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Simplified Revenue Chart Card -->
+<section class="bg-surface-container-lowest rounded-xl p-5 shadow-ambient">
+<div class="flex justify-between items-center mb-6">
+<h3 class="font-headline text-xl font-bold text-on-surface">Revenue Curve</h3>
+<button class="text-primary hover:text-primary-container transition-colors p-2 -mr-2 min-w-[44px] min-h-[44px] flex items-center justify-center">
+<span class="material-symbols-outlined">more_horiz</span>
+</button>
+</div>
+<!-- Abstracted Chart Graphic (CSS Gradient to simulate area chart) -->
+<div class="w-full h-32 relative rounded-lg overflow-hidden bg-surface-container-low focus-ring-glow flex items-end">
+<div class="w-full h-[60%] bg-gradient-to-t from-primary/20 to-transparent relative">
+<!-- SVG Path for curve simulation -->
+<svg class="absolute top-0 w-full h-full text-primary drop-shadow-[0_4px_12px_rgba(141,75,0,0.3)]" fill="none" preserveaspectratio="none" viewbox="0 0 100 100">
+<path d="M0,80 C20,60 40,90 60,40 C80,-10 100,50 100,50" stroke="currentColor" stroke-linecap="round" stroke-width="3"></path>
+</svg>
+</div>
+</div>
+<div class="flex justify-between mt-3 text-xs font-body text-on-surface-variant">
+<span>8 AM</span>
+<span>12 PM</span>
+<span>4 PM</span>
+<span>Now</span>
+</div>
+</section>
+<!-- Top Products List -->
+<section class="bg-surface-container-lowest rounded-xl p-5 shadow-ambient">
+<h3 class="font-headline text-xl font-bold text-on-surface mb-6">Signature Sellers</h3>
+<div class="flex flex-col gap-6">
+<!-- Product Row 1 -->
+<div class="flex items-center gap-4 group cursor-pointer hover:bg-surface-container-high p-2 -m-2 rounded-lg transition-colors">
+<div class="w-14 h-14 rounded-lg bg-surface-container-low overflow-hidden shrink-0 shadow-sm relative">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="close up of rustic sourdough artisan loaf with flour dusting on dark wood surface warm lighting" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC3GDkIafEiNv2QqDYOcYeqbpCgUEVV8VT7KWWFu-1dDl_oKJD2ytQywhbVpaPPCi4c-hq4p2j0AbDumDhk10mkEeV_G2XdZ3oa-9UbBNBCgQfNvxpPHa33ZcIU8BUGvgLroVd-W1Vfd-4GQ4snDZm5TMYs8t8dNf1NPY4BZsqQ0qIvIPwHmgVp-27XVtXV2Xd5UINIrKWSMp_R1DRNMHtEUXaUZoYgZ3Xi0q6DOpEvBPVSsvfgd_yz7HAAKjZM9C0MkNT1sGemzLBs');"></div>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-body text-sm font-semibold text-on-surface truncate">Rustic Sourdough Boule</h4>
+<p class="font-label text-xs text-on-surface-variant mt-0.5">48 units sold</p>
+</div>
+<div class="text-right shrink-0">
+<p class="font-headline text-sm font-bold text-primary">$432.00</p>
+<span class="inline-flex items-center gap-0.5 text-[10px] font-bold text-tertiary mt-1">
+<span class="material-symbols-outlined text-[12px]">trending_up</span> Top
+                        </span>
+</div>
+</div>
+<!-- Product Row 2 -->
+<div class="flex items-center gap-4 group cursor-pointer hover:bg-surface-container-high p-2 -m-2 rounded-lg transition-colors">
+<div class="w-14 h-14 rounded-lg bg-surface-container-low overflow-hidden shrink-0 shadow-sm relative">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="flaky golden butter croissant on white parchment paper with soft morning bakery light" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuD5FzjDpbt8OCn3qZG9QeydrNEaJ5uDF3U1UQrrb7B78Eq_pqj6UgL5FWNNn21kMx-K_A8iVi48Oo4JGe3X7gfp2mBeTmrdYTxQzcUBS-m45RXtZURvikQ6tzxYuA2_odh80kxyxf1JmJnuKkxSDLc9oB_ez1gnxwFaPx-NHANEsProfYtbZVI1RSg0fwqcJZisbk3ysV6e45ynNoDGGW7oljsEPf9VtzmC_GDPyIjGiWxoYJ1qfKuRgiAXsnopnsn5OUA3RSJ2udD6');"></div>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-body text-sm font-semibold text-on-surface truncate">Classic Butter Croissant</h4>
+<p class="font-label text-xs text-on-surface-variant mt-0.5">112 units sold</p>
+</div>
+<div class="text-right shrink-0">
+<p class="font-headline text-sm font-bold text-on-surface">$392.00</p>
+</div>
+</div>
+<!-- Product Row 3 -->
+<div class="flex items-center gap-4 group cursor-pointer hover:bg-surface-container-high p-2 -m-2 rounded-lg transition-colors">
+<div class="w-14 h-14 rounded-lg bg-surface-container-low overflow-hidden shrink-0 shadow-sm relative">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="artisan chocolate babka loaf sliced revealing rich chocolate swirls on wooden cutting board" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuApvhxf1WawNo5BqFTnXXbFUGhSav33vWpRbQL2jxlXNwNaNawmY-ouLQztCneR_LVRHt2U1_aTJYORM8MvJRYZoxbxhN_x6OYvSW3ZPUtbJy1VTzvTLI1NR6DJLB1TpuzWZL1GsR0NsTQLM8wMvFjdrBWdUtpzrwqQVCU4aa3grf-hO_h2H3vJYNfJFKZlUS8G-KU-BllEj5DauBFG2kSIIVcfFTt2eYL7uaehdqzljRhSW7J50CYiU3CJ9lgrOa4d3SXJssdPWYDT');"></div>
+</div>
+<div class="flex-1 min-w-0">
+<h4 class="font-body text-sm font-semibold text-on-surface truncate">Dark Chocolate Babka</h4>
+<p class="font-label text-xs text-on-surface-variant mt-0.5">15 units sold</p>
+</div>
+<div class="text-right shrink-0">
+<p class="font-headline text-sm font-bold text-on-surface">$270.00</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 rounded-lg border border-outline-variant/30 text-primary font-label text-sm font-semibold hover:bg-surface-container-low transition-colors min-h-[44px] flex items-center justify-center gap-2">
+                View Full Inventory
+                <span class="material-symbols-outlined text-sm">arrow_forward</span>
+</button>
+</section>
+</main>
+</body></html>
