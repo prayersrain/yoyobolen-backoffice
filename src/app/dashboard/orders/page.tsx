@@ -191,7 +191,7 @@ export default function OrderManagement() {
                         >
                           <Printer className="w-4 h-4" />
                         </Button>
-                        <Link href={`/payment/${order.id}`} target="_blank">
+                        <Link href={`/payment/${order.id}`}>
                           <Button variant="ghost" size="icon" title="View Payment Page" className="text-muted-foreground hover:text-primary">
                             <Eye className="w-4 h-4" />
                           </Button>

@@ -273,7 +273,7 @@ export default function SalesDashboard() {
                             >
                               <Printer className="w-4 h-4" />
                             </Button>
-                            <Link href={`/payment/${order.id}`} target="_blank">
+                            <Link href={`/payment/${order.id}`}>
                               <Button variant="ghost" size="icon" className="h-8 w-8 hover:bg-primary/10">
                                   <ChevronRightLucide className="w-4 h-4" />
                               </Button>
