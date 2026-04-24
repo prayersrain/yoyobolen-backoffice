@@ -22,9 +22,10 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { getOrders } from "../actions";
+import { getOrders, syncPaymentStatus } from "../actions";
 import { OrderReceipt } from "@/components/orders/OrderReceipt";
-import { Printer } from "lucide-react";
+import { Printer, RefreshCw, Share2, ShieldCheck, Check, Copy } from "lucide-react";
+import { toast } from "sonner";
 
 export default function OrderManagement() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -32,17 +33,52 @@ export default function OrderManagement() {
   const [orders, setOrders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [syncingIds, setSyncingIds] = useState<Set<string>>(new Set());
+
+  async function fetchOrders() {
+    setLoading(true);
+    const res = await getOrders();
+    if (res.success && res.data) {
+      setOrders(res.data);
+    }
+    setLoading(false);
+  }
 
   useEffect(() => {
-    async function fetchOrders() {
-      const res = await getOrders();
-      if (res.success && res.data) {
-        setOrders(res.data);
-      }
-      setLoading(false);
-    }
     fetchOrders();
   }, []);
+
+  const handleSync = async (orderId: string) => {
+    setSyncingIds(prev => new Set(prev).add(orderId));
+    try {
+      const res = await syncPaymentStatus(orderId);
+      if (res.success) {
+        if (res.updated) {
+          toast.success(`Status updated to ${res.status}`);
+          fetchOrders(); // Refresh list
+        } else {
+          toast.info(`Payment status is still ${res.status}`);
+        }
+      } else {
+        toast.error(`Sync failed: ${res.error}`);
+      }
+    } finally {
+      setSyncingIds(prev => {
+        const next = new Set(prev);
+        next.delete(orderId);
+        return next;
+      });
+    }
+  };
+
+  const copyPaymentLink = (order: any) => {
+    if (!order.snapUrl) {
+      toast.error("No payment link available for this order.");
+      return;
+    }
+    navigator.clipboard.writeText(order.snapUrl);
+    toast.success("Payment link copied to clipboard!");
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -73,7 +109,7 @@ export default function OrderManagement() {
         </div>
         <Link 
           href="/dashboard/orders/new" 
-          className="inline-flex items-center justify-center whitespace-nowrap outline-none transition-all focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 select-none bg-primary text-primary-foreground hover:bg-primary/90 text-white shadow-sm px-6 h-12 rounded-lg text-sm font-medium"
+          className="inline-flex items-center justify-center whitespace-nowrap outline-none transition-all focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 select-none bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm px-6 h-12 rounded-lg text-sm font-medium"
         >
           <Plus className="w-5 h-5 mr-2" />
           New Order
@@ -163,17 +199,25 @@ export default function OrderManagement() {
                       </div>
                     </TableCell>
                     <TableCell className="py-4 px-6">
-                      <span className="bg-stone-100 px-3 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider border border-stone-200/50">
+                      <Badge className="bg-primary text-primary-foreground border-none text-[8px] font-bold uppercase tracking-widest px-2 py-0.5 shadow-sm shadow-primary/20">
                         {order.channel}
-                      </span>
+                      </Badge>
                     </TableCell>
                     <TableCell className="py-4 px-6 font-serif font-bold">
                       Rp {parseFloat(order.totalAmount).toLocaleString()}
                     </TableCell>
                     <TableCell className="py-4 px-6">
-                      <Badge variant="secondary" className={`${getStatusColor(order.status)} border-none font-bold uppercase text-[9px] tracking-widest px-2 py-0.5`}>
-                        {order.status}
-                      </Badge>
+                      <div className="flex flex-col gap-1 items-start">
+                        <Badge variant="secondary" className={`${getStatusColor(order.status)} border-none font-bold uppercase text-[9px] tracking-widest px-2 py-0.5`}>
+                          {order.status}
+                        </Badge>
+                        {order.status === "PAID" && (
+                          <span className="flex items-center gap-1 text-[8px] font-bold text-green-600 uppercase tracking-tighter">
+                            <ShieldCheck className="w-2.5 h-2.5" />
+                            Verified by Sys
+                          </span>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell className="py-4 px-6 text-muted-foreground text-xs">
                       {new Date(order.createdAt).toLocaleDateString()}
@@ -182,6 +226,26 @@ export default function OrderManagement() {
                     </TableCell>
                     <TableCell className="py-4 px-6 text-right">
                       <div className="flex items-center justify-end gap-1">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => handleSync(order.id)}
+                          disabled={syncingIds.has(order.id) || order.status === "PAID" || order.status === "CANCELLED"}
+                          title="Sync Status with Midtrans" 
+                          className="text-muted-foreground hover:text-blue-600"
+                        >
+                          <RefreshCw className={`w-4 h-4 ${syncingIds.has(order.id) ? "animate-spin" : ""}`} />
+                        </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          onClick={() => copyPaymentLink(order)}
+                          disabled={order.status === "PAID"}
+                          title="Copy Payment Link" 
+                          className="text-muted-foreground hover:text-amber-600"
+                        >
+                          <Share2 className="w-4 h-4" />
+                        </Button>
                         <Button 
                           variant="ghost" 
                           size="icon" 

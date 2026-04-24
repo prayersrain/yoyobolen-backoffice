@@ -13,3 +13,25 @@ export async function getProducts() {
     return { success: false, data: [], error: error.message };
   }
 }
+
+export async function checkCustomerBlacklist(phone: string) {
+  try {
+    const customer = await prisma.customer.findUnique({
+      where: { phone },
+      select: { isBlacklisted: true, blacklistNote: true, name: true }
+    });
+    
+    if (customer && customer.isBlacklisted) {
+      return { 
+        isBlacklisted: true, 
+        note: customer.blacklistNote,
+        name: customer.name
+      };
+    }
+    
+    return { isBlacklisted: false };
+  } catch (error) {
+    console.error("Blacklist check error:", error);
+    return { isBlacklisted: false };
+  }
+}

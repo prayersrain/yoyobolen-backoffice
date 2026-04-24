@@ -13,22 +13,40 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { 
-  CalendarIcon, Plus, Banknote, Receipt, 
+  Plus, Banknote, Receipt, 
   TrendingUp as TrendingUpLucide, ShoppingBag, 
-  MoreHorizontal, ChevronRight as ChevronRightLucide, 
-  Loader2, QrCode
+  ChevronRight as ChevronRightLucide, 
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { getOrders, getSalesMetrics } from "../actions";
 import { OrderReceipt } from "@/components/orders/OrderReceipt";
 import { Printer } from "lucide-react";
 
+interface Metrics {
+  revenueToday: number;
+  totalOrders: number;
+  avgOrderValue: number;
+  chartData: number[];
+}
+
+interface DashboardOrder {
+  id: string;
+  customer?: { name: string; phone: string };
+  totalAmount: number;
+  status: string;
+  createdAt: string;
+  channel: string;
+  paymentMethod: string;
+  snapUrl?: string;
+  items?: any[];
+}
+
 export default function SalesDashboard() {
-  const [metrics, setMetrics] = useState<any>(null);
-  const [recentOrders, setRecentOrders] = useState<any[]>([]);
+  const [metrics, setMetrics] = useState<Metrics | null>(null);
+  const [recentOrders, setRecentOrders] = useState<DashboardOrder[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [selectedOrder, setSelectedOrder] = useState<DashboardOrder | null>(null);
 
   useEffect(() => {
     async function loadDashboard() {
@@ -197,13 +215,33 @@ export default function SalesDashboard() {
             </div>
           </CardHeader>
           <CardContent className="flex-1 relative w-full mt-4 flex items-end pt-10 px-6 pb-6 overflow-hidden">
-             {/* Chart Placeholder for now but with real scale hint */}
-            <div className="w-full h-full flex items-center justify-center border-2 border-dashed border-stone-200 rounded-2xl bg-stone-100/50">
-                 <div className="text-center">
-                    <TrendingUpLucide className="w-10 h-10 text-stone-300 mx-auto mb-2" />
-                    <p className="text-xs text-muted-foreground uppercase font-bold tracking-widest italic font-sans opacity-50">Trend analysis will develop as you sell</p>
-                 </div>
-            </div>
+             {/* Dynamic CSS Bar Chart */}
+             <div className="w-full h-40 flex items-end justify-between gap-2 lg:gap-4">
+                {metrics?.chartData?.map((value: number, i: number) => {
+                   const max = Math.max(...metrics.chartData, 1);
+                   const height = (value / max) * 100;
+                   return (
+                      <div key={i} className="flex-1 flex flex-col items-center gap-2 group relative">
+                         <div 
+                            className="w-full bg-primary/20 rounded-t-lg transition-all duration-700 ease-out relative overflow-hidden"
+                            style={{ height: `${Math.max(height, 5)}%` }}
+                         >
+                            <div 
+                               className="absolute bottom-0 left-0 w-full bg-linear-to-t from-primary to-primary/40 rounded-t-lg transition-all group-hover:brightness-110" 
+                               style={{ height: '100%' }}
+                            ></div>
+                            {/* Hover Tooltip */}
+                            <div className="absolute -top-8 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-[10px] font-bold px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none z-10">
+                               Rp {value.toLocaleString()}
+                            </div>
+                         </div>
+                         <span className="text-[9px] font-bold text-stone-400 uppercase tracking-tighter">
+                            {['S','M','T','W','T','F','S'][(new Date().getDay() - (6 - i) + 7) % 7]}
+                         </span>
+                      </div>
+                   );
+                })}
+             </div>
           </CardContent>
         </Card>
 
@@ -256,7 +294,7 @@ export default function SalesDashboard() {
                             <span className="font-semibold text-xs">{order.customer?.name}</span>
                         </div>
                         </TableCell>
-                        <TableCell className="font-serif font-bold text-sm">Rp {parseFloat(order.totalAmount).toLocaleString()}</TableCell>
+                        <TableCell className="font-serif font-bold text-sm">Rp {order.totalAmount.toLocaleString()}</TableCell>
                         <TableCell>
                         <Badge variant="secondary" className={`${getStatusColor(order.status)} border-none text-[9px] font-bold uppercase tracking-widest px-2 py-0.5`}>
                             {order.status}

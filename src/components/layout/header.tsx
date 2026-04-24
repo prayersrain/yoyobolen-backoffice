@@ -15,7 +15,11 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import Link from "next/link";
 
-export function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export function Header({ onMenuClick }: HeaderProps) {
   const router = useRouter();
   const supabase = createClient();
 
@@ -37,19 +41,23 @@ export function Header() {
           <h1 className="font-serif font-semibold text-stone-900 text-xl tracking-tight hidden md:block">
             The Artisanal Ledger
           </h1>
-          {/* Search Bar */}
           <div className="relative hidden md:block w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input 
               className="pl-9 pr-4 py-2 h-9 bg-white border-none shadow-[0_2px_10px_rgba(85,67,54,0.04)] focus-visible:ring-1 focus-visible:ring-primary/20" 
               placeholder="Search orders, products..." 
+              onKeyDown={(e) => e.key === 'Enter' && toast.info("Search functionality is coming soon!")}
             />
           </div>
         </div>
         
         {/* Trailing Actions */}
         <div className="flex items-center gap-2">
-          <button aria-label="Notifications" className="p-2 text-stone-500 hover:text-primary transition-colors rounded-full hover:bg-stone-200/50">
+          <button 
+            aria-label="Notifications" 
+            onClick={() => toast.info("You have no new notifications")}
+            className="p-2 text-stone-500 hover:text-primary transition-colors rounded-full hover:bg-stone-200/50"
+          >
             <Bell className="w-5 h-5" />
           </button>
           
@@ -82,7 +90,11 @@ export function Header() {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <button aria-label="Menu" className="md:hidden p-2 ml-2 text-stone-500 hover:bg-stone-200/50 rounded-md">
+          <button 
+            aria-label="Menu" 
+            onClick={onMenuClick}
+            className="md:hidden p-2 ml-2 text-stone-500 hover:bg-stone-200/50 rounded-md"
+          >
             <Menu className="w-6 h-6" />
           </button>
         </div>

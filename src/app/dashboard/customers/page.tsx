@@ -14,10 +14,23 @@ import {
 } from "@/components/ui/table";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { getCustomers } from "./actions";
+import { getCustomers, toggleCustomerBlacklist } from "./actions";
+import { Ban, ShieldCheck } from "lucide-react";
+import { toast } from "sonner";
+
+interface Customer {
+  id: string;
+  name: string;
+  phone: string;
+  email?: string;
+  isBlacklisted: boolean;
+  orderCount: number;
+  totalSpent: number;
+  createdAt: string;
+}
 
 export default function CustomerDatabase() {
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -116,15 +129,49 @@ export default function CustomerDatabase() {
                       <p className="font-serif font-bold text-sm">
                         Rp {customer.totalSpent.toLocaleString()}
                       </p>
-                      <Badge variant="secondary" className="bg-green-50 text-green-700 border-none text-[8px] font-bold uppercase tracking-widest px-2 py-0">
-                        Active
-                      </Badge>
+                      {customer.isBlacklisted ? (
+                        <Badge variant="destructive" className="bg-red-50 text-red-700 border-none text-[8px] font-bold uppercase tracking-widest px-2 py-0">
+                          Blacklisted
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="bg-green-50 text-green-700 border-none text-[8px] font-bold uppercase tracking-widest px-2 py-0">
+                          Active Patrons
+                        </Badge>
+                      )}
                     </div>
                   </TableCell>
                   <TableCell className="py-4 px-6 whitespace-nowrap text-right">
-                    <Button variant="ghost" size="sm" className="text-primary font-bold uppercase text-[10px] tracking-widest">
-                      Ledger History
-                    </Button>
+                    <div className="flex items-center justify-end gap-2">
+                        <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            onClick={async () => {
+                                if (customer.isBlacklisted) {
+                                    const res = await toggleCustomerBlacklist(customer.id, false);
+                                    if (res.success) {
+                                        toast.success("Customer removed from blacklist");
+                                        window.location.reload();
+                                    }
+                                } else {
+                                    const reason = prompt("Enter reason for blacklisting this customer:");
+                                    if (reason) {
+                                        const res = await toggleCustomerBlacklist(customer.id, true, reason);
+                                        if (res.success) {
+                                            toast.success("Customer blacklisted!");
+                                            window.location.reload();
+                                        }
+                                    }
+                                }
+                            }}
+                            className={customer.isBlacklisted ? "text-green-600 hover:bg-green-50" : "text-stone-300 hover:text-red-600 hover:bg-red-50"}
+                            title={customer.isBlacklisted ? "Allow Customer" : "Blacklist Customer"}
+                        >
+                            {customer.isBlacklisted ? <ShieldCheck className="w-4 h-4" /> : <Ban className="w-4 h-4" />}
+                        </Button>
+                        <Button variant="ghost" size="sm" className="text-primary font-bold uppercase text-[10px] tracking-widest">
+                            Ledger History
+                        </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}

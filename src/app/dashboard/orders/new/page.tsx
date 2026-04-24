@@ -4,24 +4,25 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { 
   ArrowLeft, User, Phone, MapPin, Package, Search, Plus, Minus, X, 
-  Store, MessageCircle, QrCode, CreditCard, Loader2, CheckCircle2, Copy 
+  Store, MessageCircle, QrCode, CreditCard, Loader2, CheckCircle2, Copy, AlertCircle 
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { getProducts } from "./actions";
+import { getProducts, checkCustomerBlacklist } from "./actions";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 interface CartItem {
   id: string;
@@ -31,9 +32,24 @@ interface CartItem {
   imageUrl?: string;
 }
 
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: string | number;
+  imageUrl: string;
+}
+
+interface OrderResult {
+  success: boolean;
+  orderId: string;
+  snapUrl?: string;
+  snapRedirectUrl?: string;
+}
+
 export default function NewOrder() {
   // State for products and UI
-  const [products, setProducts] = useState<any[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -49,9 +65,39 @@ export default function NewOrder() {
   const [paymentMethod, setPaymentMethod] = useState("qris");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  // State for Success Modal
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [orderResult, setOrderResult] = useState<any>(null);
+  const [orderResult, setOrderResult] = useState<OrderResult | null>(null);
+  const [blacklistInfo, setBlacklistInfo] = useState<{ isBlacklisted: boolean; note?: string | null; name?: string } | null>(null);
+
+  // Check blacklist on phone change
+  useEffect(() => {
+    let active = true;
+    
+    if (customer.phone.length < 10) {
+      // Defer reset to avoid synchronous setState in effect warning
+      const resetTimer = setTimeout(() => {
+        if (active && blacklistInfo !== null) {
+          setBlacklistInfo(null);
+        }
+      }, 0);
+      return () => {
+        active = false;
+        clearTimeout(resetTimer);
+      };
+    }
+
+    const timer = setTimeout(async () => {
+      const res = await checkCustomerBlacklist(customer.phone);
+      if (active) {
+        setBlacklistInfo(res.isBlacklisted ? res : null);
+      }
+    }, 500);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [customer.phone, blacklistInfo]);
 
   // Load products on mount
   useEffect(() => {
@@ -77,7 +123,7 @@ export default function NewOrder() {
     return matchesSearch && matchesCategory;
   });
 
-  const addToCart = (product: any) => {
+  const addToCart = (product: Product) => {
     setCart(prev => {
       const existing = prev.find(item => item.id === product.id);
       if (existing) {
@@ -88,7 +134,7 @@ export default function NewOrder() {
       return [...prev, { 
         id: product.id, 
         name: product.name, 
-        price: parseFloat(product.price), 
+        price: Number(product.price), 
         quantity: 1, 
         imageUrl: product.imageUrl 
       }];
@@ -184,6 +230,20 @@ export default function NewOrder() {
               </div>
             </CardHeader>
             <CardContent className="pt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+              {blacklistInfo?.isBlacklisted && (
+                <div className="md:col-span-2">
+                  <Alert variant="destructive" className="bg-red-50 border-red-200 text-red-800 animate-in slide-in-from-top duration-300">
+                    <AlertCircle className="h-4 w-4" />
+                    <AlertTitle className="font-serif font-bold">⚠️ Customer Blacklisted!</AlertTitle>
+                    <AlertDescription className="text-xs">
+                      Customer <span className="font-bold underline">{blacklistInfo.name || "this number"}</span> is flagged. 
+                      Note: <span className="italic font-medium">{blacklistInfo.note || "No details provided."}</span>
+                      <br/>
+                      <span className="font-bold uppercase tracking-widest mt-1 block">Proceed with extreme caution.</span>
+                    </AlertDescription>
+                  </Alert>
+                </div>
+              )}
               <div className="space-y-2">
                 <Label htmlFor="customer_name" className="text-[11px] uppercase tracking-wider text-muted-foreground">Full Name</Label>
                 <div className="relative">
@@ -285,10 +345,11 @@ export default function NewOrder() {
                         className="group bg-white rounded-xl p-3 border border-stone-200 hover:border-primary/50 hover:shadow-md transition-all cursor-pointer flex flex-col gap-2 relative overflow-hidden"
                       >
                         <div className="relative aspect-square overflow-hidden rounded-lg mb-1">
-                          <img 
+                          <Image 
                             src={p.imageUrl} 
                             alt={p.name} 
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
+                            fill
+                            className="object-cover group-hover:scale-110 transition-transform duration-300" 
                           />
                           <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity">
                             <div className="w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center shadow-lg">
@@ -298,7 +359,7 @@ export default function NewOrder() {
                         </div>
                         <div className="flex flex-col">
                           <p className="font-bold text-[13px] leading-tight line-clamp-1">{p.name}</p>
-                          <p className="text-[11px] text-primary font-semibold mt-1">Rp {parseFloat(p.price).toLocaleString()}</p>
+                          <p className="text-[11px] text-primary font-semibold mt-1">Rp {Number(p.price).toLocaleString()}</p>
                         </div>
                       </div>
                     ))
@@ -325,7 +386,9 @@ export default function NewOrder() {
                   cart.map(item => (
                     <div key={item.id} className="flex items-center justify-between p-4 bg-white rounded-xl border border-stone-100 shadow-sm hover:shadow-md transition-shadow">
                       <div className="flex items-center gap-4">
-                        <img src={item.imageUrl} alt={item.name} className="w-12 h-12 rounded-lg object-cover" />
+                        <div className="relative w-12 h-12 rounded-lg overflow-hidden shrink-0">
+                            <Image src={item.imageUrl || ""} alt={item.name} fill className="object-cover" />
+                        </div>
                         <div>
                           <h4 className="font-semibold text-sm">{item.name}</h4>
                           <p className="text-xs text-muted-foreground">Rp {item.price.toLocaleString()}</p>

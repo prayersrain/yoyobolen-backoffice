@@ -71,3 +71,32 @@ model LoginAttempt {
   lastAttempt  DateTime  @default(now())
   lockUntil    DateTime?
 }
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String?  // For auth user identification
+  action    String
+  targetId  String?
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model ClosingSession {
+  id              String   @id @default(cuid())
+  closedAt        DateTime @default(now())
+  totalOrders     Int
+  totalRevenue    Decimal  @db.Decimal(12, 2)
+  cashInHand      Decimal  @db.Decimal(12, 2)
+  difference      Decimal  @db.Decimal(12, 2)
+  notes           String?
+  staffName       String?
+}
+
+model Expense {
+  id          String   @id @default(cuid())
+  label       String   // e.g., "Electricity", "Raw Materials"
+  amount      Decimal  @db.Decimal(12, 2)
+  category    String   // Operational, Materials, Marketing, etc.
+  date        DateTime @default(now())
+  notes       String?
+}

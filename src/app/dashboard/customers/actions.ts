@@ -27,8 +27,25 @@ export async function getCustomers() {
     });
 
     return { success: true, data: JSON.parse(JSON.stringify(customersWithStats)) };
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error fetching customers:", error);
-    return { success: false, data: [], error: error.message };
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, data: [], error: errorMessage };
+  }
+}
+
+export async function toggleCustomerBlacklist(customerId: string, status: boolean, note?: string) {
+  try {
+    await prisma.customer.update({
+      where: { id: customerId },
+      data: { 
+        isBlacklisted: status,
+        blacklistNote: note
+      }
+    });
+    return { success: true };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return { success: false, error: errorMessage };
   }
 }
