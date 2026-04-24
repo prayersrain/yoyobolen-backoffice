@@ -25,7 +25,7 @@ export async function getSalesMetrics() {
       where: { status: 'PAID' }
     });
 
-    const totalRevenue = orders.reduce((acc, order) => acc + parseFloat(order.totalAmount.toString()), 0);
+    const totalRevenue = orders.reduce((acc: number, order) => acc + parseFloat(order.totalAmount.toString()), 0);
     const totalOrders = await prisma.order.count();
     
     // Simple mock for chart for now, but based on real count
