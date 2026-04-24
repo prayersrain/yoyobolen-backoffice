@@ -22,7 +22,7 @@ model Product {
 model Customer {
   id            String    @id @default(cuid())
   name          String
-  email         String?   @unique
+  email         String?
   phone         String    @unique
   isBlacklisted Boolean   @default(false)
   blacklistNote String?
@@ -41,6 +41,7 @@ model Order {
   paymentMethod String      @default("QRIS") // QRIS, Transfer, etc.
   snapToken     String?     // Midtrans Snap Token
   snapUrl       String?     // Midtrans Snap Redirect URL
+  paymentData   Json?       // Midtrans Core API Raw Data (VA/QRIS)
   items         OrderItem[]
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt

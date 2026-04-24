@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { getProducts, checkCustomerBlacklist } from "./actions";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -63,6 +64,7 @@ export default function NewOrder() {
   });
   const [channel, setChannel] = useState("storefront");
   const [paymentMethod, setPaymentMethod] = useState("qris");
+  const [selectedBank, setSelectedBank] = useState("bca");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -174,7 +176,8 @@ export default function NewOrder() {
           cartItems: cart,
           totalAmount: total,
           channel,
-          paymentMethod
+          paymentMethod,
+          selectedBank: paymentMethod === "transfer" ? selectedBank : undefined
         }),
       });
 
@@ -453,13 +456,35 @@ export default function NewOrder() {
                       <div className="text-[11px] text-muted-foreground mt-1">Instant generation</div>
                     </Label>
                   </div>
-                  <div className="flex items-center space-x-3 border border-stone-200 rounded-lg p-3 hover:bg-stone-50 has-[:checked]:bg-stone-100 has-[:checked]:border-stone-300 transition-colors">
-                    <RadioGroupItem value="transfer" id="pay-transfer" />
-                    <Label htmlFor="pay-transfer" className="flex-1 cursor-pointer">
-                      <div className="font-medium text-sm flex items-center gap-2">
-                        <CreditCard className="w-4 h-4" /> Bank Transfer
+                  <div className="space-y-2">
+                    <div className="flex items-center space-x-3 border border-stone-200 rounded-lg p-3 hover:bg-stone-50 has-[:checked]:bg-stone-100 has-[:checked]:border-stone-300 transition-colors">
+                      <RadioGroupItem value="transfer" id="pay-transfer" />
+                      <Label htmlFor="pay-transfer" className="flex-1 cursor-pointer">
+                        <div className="font-medium text-sm flex items-center gap-2">
+                          <CreditCard className="w-4 h-4" /> Bank Transfer (VA)
+                        </div>
+                      </Label>
+                    </div>
+
+                    {paymentMethod === "transfer" && (
+                      <div className="grid grid-cols-2 gap-2 pl-7 animate-in fade-in slide-in-from-top-1 duration-200">
+                        {["bca", "bni", "bri", "mandiri"].map((bank) => (
+                          <button
+                            key={bank}
+                            type="button"
+                            onClick={() => setSelectedBank(bank)}
+                            className={cn(
+                              "px-3 py-2 rounded-md text-[10px] font-bold uppercase tracking-widest border transition-all",
+                              selectedBank === bank
+                                ? "bg-primary text-white border-primary shadow-sm"
+                                : "bg-white text-stone-400 border-stone-100 hover:border-stone-200"
+                            )}
+                          >
+                            {bank}
+                          </button>
+                        ))}
                       </div>
-                    </Label>
+                    )}
                   </div>
                 </RadioGroup>
               </div>
@@ -521,25 +546,25 @@ export default function NewOrder() {
             <div className="space-y-3">
               <Button 
                 onClick={() => {
-                  const url = orderResult?.snapRedirectUrl || orderResult?.snapUrl || `${window.location.origin}/payment/${orderResult?.orderId}`;
+                  const url = `${window.location.origin}/payment/${orderResult?.orderId}`;
                   navigator.clipboard.writeText(url);
-                  alert("Link Pembayaran Berhasil Disalin!");
+                  toast.success("Link Pembayaran Berhasil Disalin!");
                 }}
-                className="w-full h-12 bg-stone-100 text-stone-800 hover:bg-stone-200 border-none shadow-none"
+                className="w-full h-14 bg-stone-100 text-stone-800 hover:bg-stone-200 border-none shadow-none font-bold rounded-2xl"
               >
                 <Copy className="w-4 h-4 mr-2" /> Salin Link Pembayaran
               </Button>
               
-              <a href={orderResult?.snapRedirectUrl || orderResult?.snapUrl || "#"} rel="noopener noreferrer" className="block w-full">
-                <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20">
-                  <CreditCard className="w-4 h-4 mr-2" /> Bayar Sekarang (Snap)
+              <Link href={`/payment/${orderResult?.orderId}`} className="block w-full">
+                <Button className="w-full h-14 bg-primary hover:bg-primary/90 text-white shadow-lg shadow-primary/20 font-bold rounded-2xl">
+                  <QrCode className="w-4 h-4 mr-2" /> Buka Halaman Pembayaran
                 </Button>
-              </a>
+              </Link>
             </div>
 
             <div className="pt-4 border-t border-stone-100 flex justify-center">
-              <Button variant="ghost" onClick={() => window.location.reload()} className="text-muted-foreground hover:text-foreground">
-                Create Another Order
+              <Button variant="ghost" onClick={() => window.location.reload()} className="text-muted-foreground hover:text-foreground font-medium">
+                Buat Pesanan Baru
               </Button>
             </div>
           </div>

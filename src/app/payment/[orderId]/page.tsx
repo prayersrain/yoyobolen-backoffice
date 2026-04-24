@@ -1,10 +1,15 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { Clock, Lock, CheckCircle2, MoreHorizontal, Loader2, AlertCircle, ArrowLeft, CreditCard } from "lucide-react";
+import { 
+  Clock, Lock, CheckCircle2, MoreHorizontal, Loader2, AlertCircle, 
+  ArrowLeft, CreditCard, Copy, Check, QrCode
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getOrderDetails, checkPaymentStatus } from "./actions";
 import { supabase } from "@/lib/supabase";
+import { QRCodeSVG } from "qrcode.react";
+import { toast } from "sonner";
 
 export default function PaymentPage({ params }: { params: Promise<{ orderId: string }> }) {
   const [order, setOrder] = useState<any>(null);
@@ -12,20 +17,28 @@ export default function PaymentPage({ params }: { params: Promise<{ orderId: str
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string>("PENDING");
   const [isChecking, setIsChecking] = useState(false);
+  const [copied, setCopied] = useState(false);
 
-  // Unwrapping params using React.use() - required in Next.js 15+ 16+
+  // Unwrapping params using React.use()
   const resolvedParams = use(params);
   const orderId = resolvedParams.orderId;
+
+  const handleCopyVA = (va: string) => {
+    navigator.clipboard.writeText(va);
+    setCopied(true);
+    toast.success("VA Number copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleStatusRefresh = async () => {
     setIsChecking(true);
     const res = await checkPaymentStatus(orderId);
-    if (res.success && res.status === "PAID") {
+    if (res.success && res.status === "settlement") {
       setStatus("PAID");
     } else if (res.success) {
-      alert(`Status saat ini: ${res.status}. Silakan selesaikan pembayaran di Midtrans.`);
+      toast.info(`Status: ${res.status.toUpperCase()}. Please complete the payment.`);
     } else {
-      alert("Gagal mengecek status. Coba lagi nanti.");
+      toast.error("Failed to check status. Please try again.");
     }
     setIsChecking(false);
   };
@@ -44,7 +57,6 @@ export default function PaymentPage({ params }: { params: Promise<{ orderId: str
     loadOrder();
 
     // SETUP REALTIME LISTENER
-    // This will trigger whenever the specific order ID is updated in the DB
     const channel = supabase
       .channel(`order-status-${orderId}`)
       .on(
@@ -56,9 +68,9 @@ export default function PaymentPage({ params }: { params: Promise<{ orderId: str
           filter: `id=eq.${orderId}`,
         },
         (payload) => {
-          console.log('Realtime update received:', payload);
           if (payload.new.status === 'PAID') {
             setStatus('PAID');
+            toast.success("Payment confirmed!");
           } else {
             setStatus(payload.new.status);
           }
@@ -73,20 +85,34 @@ export default function PaymentPage({ params }: { params: Promise<{ orderId: str
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-[#FAF9F6]">
+        <div className="flex flex-col items-center gap-4">
+          <div className="relative w-16 h-16">
+            <div className="absolute inset-0 border-4 border-primary/10 rounded-full"></div>
+            <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          <p className="font-serif italic text-stone-400">Authenticating transaction...</p>
+        </div>
       </div>
     );
   }
 
   if (error || !order) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-background p-4">
-        <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
-        <h2 className="text-xl font-serif font-bold italic mb-2">Order Not Found</h2>
-        <p className="text-muted-foreground text-center">We couldn't find the pastry order you're looking for.</p>
-        <Button onClick={() => window.location.reload()} className="mt-6 bg-stone-100 text-stone-800 hover:bg-stone-200">
-          Try Again
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#FAF9F6] p-4 text-center">
+        <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mb-6">
+          <AlertCircle className="w-10 h-10 text-red-500" />
+        </div>
+        <h2 className="text-3xl font-serif font-bold text-stone-900 mb-2">Order Not Found</h2>
+        <p className="text-stone-500 max-w-xs mx-auto leading-relaxed">
+          The artisanal ledger could not find this specific transaction record.
+        </p>
+        <Button 
+          variant="outline"
+          onClick={() => window.location.reload()} 
+          className="mt-8 border-stone-200 hover:bg-stone-50 rounded-xl px-8"
+        >
+          Refresh Page
         </Button>
       </div>
     );
@@ -94,157 +120,193 @@ export default function PaymentPage({ params }: { params: Promise<{ orderId: str
 
   if (status === "PAID") {
     return (
-      <div className="min-h-screen flex flex-col items-center py-8 px-4 md:px-8 bg-background animate-in fade-in duration-700">
-        <main className="w-full max-w-md mx-auto flex flex-col gap-6 mt-10">
-          <header className="text-center mb-4">
-            <h1 className="font-serif font-black italic text-4xl text-primary mb-1">Yoyobolen</h1>
-            <p className="font-sans text-sm text-muted-foreground uppercase tracking-[0.05em]">Secure Checkout</p>
+      <div className="min-h-screen flex flex-col items-center py-12 px-4 md:px-8 bg-[#FAF9F6] animate-in fade-in duration-1000">
+        <main className="w-full max-w-md mx-auto flex flex-col gap-8">
+          <header className="text-center">
+            <h1 className="font-serif font-black italic text-5xl text-primary mb-2">Yoyobolen</h1>
+            <div className="h-1 w-12 bg-primary/20 mx-auto rounded-full"></div>
           </header>
           
-          <div className="bg-white rounded-3xl shadow-xl border border-stone-100 p-8 flex flex-col items-center gap-4 text-center">
-            <div className="w-20 h-20 rounded-full bg-green-50 flex items-center justify-center mb-2 animate-bounce">
+          <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(85,67,54,0.08)] border border-stone-100 p-10 flex flex-col items-center gap-6 text-center relative overflow-hidden">
+            <div className="absolute -top-10 -right-10 w-40 h-40 bg-green-50 rounded-full blur-3xl opacity-50"></div>
+            
+            <div className="w-24 h-24 rounded-full bg-green-50 flex items-center justify-center mb-2 shadow-inner">
               <CheckCircle2 className="text-green-600 w-12 h-12" />
             </div>
-            <h3 className="font-serif font-bold text-3xl text-foreground">Terbayar!</h3>
-            <p className="font-sans text-sm text-muted-foreground">
-              Pembayaran senilai <span className="font-bold text-foreground">Rp {parseFloat(order.totalAmount).toLocaleString()}</span> untuk pesanan <span className="font-bold text-foreground">#{orderId.slice(-6).toUpperCase()}</span> telah berhasil kami terima.
+            <div className="space-y-2">
+              <h3 className="font-serif font-bold text-4xl text-stone-900">Terbayar!</h3>
+              <p className="text-stone-400 font-sans text-sm uppercase tracking-widest font-bold">Transaction Success</p>
+            </div>
+            
+            <div className="w-full bg-stone-50 rounded-3xl p-6 space-y-3">
+              <div className="flex justify-between text-sm">
+                <span className="text-stone-400">Order ID</span>
+                <span className="font-mono font-bold text-stone-900">#{orderId.slice(-6).toUpperCase()}</span>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-stone-400">Total Paid</span>
+                <span className="font-bold text-primary">Rp {parseFloat(order.totalAmount).toLocaleString()}</span>
+              </div>
+            </div>
+            
+            <p className="text-stone-500 font-serif italic leading-relaxed">
+              Resep tradisional kami sedang diproses untuk Anda. Harap tunggu konfirmasi dari tim kami.
             </p>
-            <div className="w-full h-px bg-stone-100 my-2"></div>
-            <p className="text-xs text-muted-foreground italic">Pastry kami sedang disiapkan spesial untuk Anda.</p>
           </div>
         </main>
       </div>
     );
   }
 
+  // CORE API DATA EXTRACTION
+  const paymentData = order.paymentData || {};
+  const isQris = order.paymentMethod === "QRIS";
+  
+  // Get QR String for QRIS
+  const qrAction = paymentData.actions?.find((a: any) => a.name === "generate-qr-code");
+  const qrString = qrAction?.url;
+
+  // Get VA Number for Transfer
+  const isMandiri = paymentData.echannel || paymentData.bill_key;
+  const vaNumber = isMandiri 
+    ? `${paymentData.biller_code} - ${paymentData.bill_key}`
+    : paymentData.va_numbers?.[0]?.va_number || "";
+    
+  const vaBank = isMandiri 
+    ? "MANDIRI" 
+    : paymentData.va_numbers?.[0]?.bank?.toUpperCase() || "BANK";
+
   return (
-    <div className="min-h-screen flex flex-col items-center py-8 px-4 md:px-8 bg-background">
-      <main className="w-full max-w-md mx-auto flex flex-col gap-6">
+    <div className="min-h-screen flex flex-col items-center py-12 px-4 md:px-8 bg-[#FAF9F6]">
+      <main className="w-full max-w-md mx-auto flex flex-col gap-8">
         {/* Header */}
-        <header className="text-center mb-4">
-          <h1 className="font-serif font-black italic text-4xl text-primary mb-1">Yoyobolen</h1>
-          <p className="font-sans text-sm text-muted-foreground uppercase tracking-[0.05em]">Secure Checkout</p>
+        <header className="text-center">
+          <h1 className="font-serif font-black italic text-5xl text-primary mb-2">Yoyobolen</h1>
+          <p className="font-sans text-xs text-stone-400 uppercase tracking-[0.3em] font-bold">The Artisanal Ledger</p>
         </header>
 
         {/* Main Payment Card */}
-        <div className="bg-white rounded-3xl shadow-xl border border-stone-100 p-6 flex flex-col items-center gap-6 relative overflow-hidden mt-4">
-          {/* decorative top bar */}
-          <div className="absolute top-0 left-0 w-full h-2 bg-primary"></div>
-          
-          {/* Status Indicator (Pending) */}
-          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 px-4 py-2 rounded-full text-sm font-medium text-amber-700">
-            <Loader2 className="w-4 h-4 animate-spin text-amber-600" />
-            <span>Menunggu Pembayaran</span>
+        <div className="bg-white rounded-[2.5rem] shadow-[0_20px_50px_rgba(85,67,54,0.08)] border border-stone-100 p-8 flex flex-col items-center gap-8 relative overflow-hidden">
+          {/* Status Chip */}
+          <div className="inline-flex items-center gap-2 bg-amber-50 border border-amber-100 px-5 py-2.5 rounded-full text-[11px] font-bold uppercase tracking-widest text-amber-700">
+            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+            Menunggu Pembayaran
           </div>
 
-          {/* Order Summary */}
-          <div className="text-center w-full pb-6 border-b border-stone-100">
-            <p className="font-sans text-sm text-muted-foreground mb-1 uppercase tracking-widest">Total Tagihan</p>
-            <h2 className="font-serif font-bold text-4xl text-foreground">Rp {parseFloat(order.totalAmount).toLocaleString()}</h2>
+          {/* Amount */}
+          <div className="text-center w-full">
+            <p className="font-sans text-xs text-stone-400 mb-2 uppercase tracking-widest font-bold">Total Tagihan</p>
+            <h2 className="font-serif font-bold text-5xl text-stone-900 tracking-tighter">
+              <span className="text-2xl mr-1 font-normal text-stone-400">Rp</span>
+              {parseFloat(order.totalAmount).toLocaleString()}
+            </h2>
           </div>
 
-          {/* Snap Payment Button */}
-          <div className="flex flex-col items-center gap-6 w-full py-4">
-            <p className="font-sans text-sm text-muted-foreground text-center px-4 leading-relaxed">
-              Kami telah menyiapkan portal pembayaran aman melalui Midtrans. Silakan klik tombol di bawah untuk melanjutkan pembayaran.
-            </p>
-            
-            <a 
-              href={order.snapUrl || "#"} 
-              rel="noopener noreferrer"
-              className="w-full"
-              onClick={(e) => {
-                if (!order.snapUrl) {
-                  e.preventDefault();
-                  alert("Link pembayaran tidak ditemukan untuk pesanan ini. Pastikan integrasi Midtrans sudah benar.");
-                }
-              }}
-            >
-              <Button className="w-full h-16 text-lg font-bold bg-[#002855] hover:bg-[#001d3d] text-white shadow-xl shadow-blue-900/20 rounded-2xl flex items-center justify-center gap-3 group transition-all">
-                <CreditCard className="w-6 h-6 group-hover:scale-110 transition-transform" />
-                BAYAR SEKARANG
-                <ArrowLeft className="w-5 h-5 rotate-180 group-hover:translate-x-1 transition-transform" />
-              </Button>
-            </a>
+          {/* QRIS or VA DISPLAY */}
+          <div className="w-full">
+            {isQris ? (
+              <div className="flex flex-col items-center gap-6">
+                <div 
+                  className="bg-white p-6 rounded-3xl border-2 border-stone-100 shadow-inner group transition-all cursor-help"
+                  title="Click to copy QR String for Simulator"
+                  onClick={() => {
+                    if (qrString) {
+                      navigator.clipboard.writeText(qrString);
+                      console.log("QR String:", qrString);
+                      toast.success("QR String copied! Use it in Midtrans Simulator.");
+                    }
+                  }}
+                >
+                  {qrString ? (
+                    <div className="relative">
+                       <QRCodeSVG value={qrString} size={220} level="H" includeMargin={false} />
+                       <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-white/10 backdrop-blur-[2px]">
+                          <div className="bg-primary text-white text-[10px] px-3 py-1.5 rounded-full font-bold uppercase tracking-widest shadow-lg">Copy Raw QR</div>
+                       </div>
+                    </div>
+                  ) : (
+                    <div className="w-[220px] h-[220px] flex items-center justify-center bg-stone-50 rounded-xl border border-dashed border-stone-200">
+                      <Loader2 className="w-8 h-8 animate-spin text-stone-300" />
+                    </div>
+                  )}
+                </div>
+                <div className="text-center space-y-1">
+                  <p className="font-bold text-stone-800">Scan QRIS</p>
+                  <p className="text-xs text-stone-400">Bisa menggunakan GoPay, OVO, Dana, atau Mobile Banking</p>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center gap-6">
+                <div className="w-full space-y-4">
+                  <div className="flex justify-between items-end px-2">
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-stone-400">Virtual Account {vaBank}</p>
+                    <div className="bg-primary/10 text-primary text-[10px] font-black px-2 py-0.5 rounded-sm uppercase tracking-tighter">Official</div>
+                  </div>
+                  <div className="relative group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-primary/10 to-stone-200 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+                    <div className="relative flex items-center justify-between p-6 bg-stone-50 rounded-2xl border border-stone-100">
+                      <span className="font-mono text-2xl font-black text-stone-800 tracking-wider">
+                        {vaNumber || "Generating..."}
+                      </span>
+                      <button 
+                        onClick={() => handleCopyVA(vaNumber)}
+                        className="p-3 bg-white rounded-xl shadow-sm hover:shadow-md active:scale-95 transition-all text-primary border border-stone-100"
+                      >
+                        {copied ? <Check className="w-5 h-5 text-green-500" /> : <Copy className="w-5 h-5" />}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="w-full text-center space-y-3">
+                   <div className="flex items-center gap-2 justify-center py-2 px-4 bg-stone-100 rounded-full w-fit mx-auto">
+                      <CreditCard className="w-3.5 h-3.5 text-stone-400" />
+                      <span className="text-[11px] font-bold text-stone-500 uppercase tracking-widest">Bank Transfer via {vaBank}</span>
+                   </div>
+                   <p className="text-[11px] text-stone-400 leading-relaxed max-w-[200px] mx-auto italic">
+                     Nomor rekening di atas bersifat unik dan akan terverifikasi secara otomatis.
+                   </p>
+                </div>
+              </div>
+            )}
+          </div>
 
+          {/* Action Footer */}
+          <div className="w-full space-y-4 pt-4 border-t border-stone-50">
             <Button 
               variant="outline" 
               onClick={handleStatusRefresh}
               disabled={isChecking}
-              className="w-full h-12 border-stone-200 text-stone-600 hover:bg-stone-50 rounded-xl flex items-center justify-center gap-2"
+              className="w-full h-14 border-stone-200 text-stone-600 hover:bg-stone-50 rounded-2xl flex items-center justify-center gap-3 font-bold transition-all shadow-sm hover:shadow-md"
             >
               {isChecking ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
+                <Loader2 className="w-5 h-5 animate-spin" />
               ) : (
-                <MoreHorizontal className="w-4 h-4" />
+                <MoreHorizontal className="w-5 h-5" />
               )}
-              {isChecking ? "Mengecek..." : "Saya Sudah Bayar / Muat Ulang Status"}
+              {isChecking ? "Verifying..." : "Refresh Payment Status"}
             </Button>
 
-            <div className="flex items-center gap-4 text-[10px] text-muted-foreground font-bold uppercase tracking-[0.2em] opacity-60">
-              <span>GoPay</span>
-              <div className="w-1 h-1 rounded-full bg-stone-300"></div>
-              <span>QRIS</span>
-              <div className="w-1 h-1 rounded-full bg-stone-300"></div>
-              <span>Bank Transfer</span>
+            <div className="text-center">
+              <p className="text-[10px] text-stone-300 uppercase font-black tracking-[0.3em]">
+                Secure Transaction • {orderId}
+              </p>
             </div>
-          </div>
-
-          {/* Timer */}
-          <div className="w-full bg-stone-50 border border-stone-100 py-3 px-6 rounded-2xl flex justify-between items-center">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Clock className="w-4 h-4 text-primary" />
-              <span className="font-sans text-xs uppercase tracking-wider">Berakhir dalam</span>
-            </div>
-            <span className="font-sans font-bold text-lg text-primary tracking-tighter">23:59:59</span>
-          </div>
-
-          {/* Helper info */}
-          <div className="w-full text-center py-2">
-            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
-              Automated system • Don't close this window
-            </p>
           </div>
         </div>
-      </main>
 
-      <footer className="mt-auto pt-8 pb-4 text-center">
-        <p className="font-sans text-xs text-muted-foreground flex items-center justify-center gap-1 opacity-60">
-          <Lock className="w-3 h-3" />
-          Secured by Artisanal Ledger Payments
-        </p>
-      </footer>
+        {/* Footer info */}
+        <div className="flex flex-col items-center gap-4 text-stone-400">
+           <div className="flex items-center gap-3">
+              <div className="h-px w-8 bg-stone-200"></div>
+              <Lock className="w-4 h-4 opacity-50" />
+              <div className="h-px w-8 bg-stone-200"></div>
+           </div>
+           <p className="font-sans text-[10px] uppercase tracking-widest font-black opacity-40">
+             Yoyobolen Digital Presence • 2024
+           </p>
+        </div>
+      </main>
     </div>
   );
 }
 
-function QrCode(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect width="5" height="5" x="3" y="3" rx="1" />
-      <rect width="5" height="5" x="16" y="3" rx="1" />
-      <rect width="5" height="5" x="3" y="16" rx="1" />
-      <path d="M21 16V21H16" />
-      <path d="M21 16H16V21" />
-      <path d="M9 10h.01" />
-      <path d="M15 10h.01" />
-      <path d="M12 12v3" />
-      <path d="M12 7v1" />
-      <path d="M12 12h3" />
-      <path d="M12 16h.01" />
-      <path d="M16 16h.01" />
-      <path d="M16 21h.01" />
-    </svg>
-  )
-}

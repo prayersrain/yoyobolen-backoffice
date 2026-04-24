@@ -57,7 +57,7 @@ export async function saveClosingSession(data: {
 
     await createAuditLog("SALES_CLOSING", session.id, `Closed by ${data.staffName} with difference ${data.difference}`);
 
-    return { success: true, data: session };
+    return { success: true, data: JSON.parse(JSON.stringify(session)) };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return { success: false, error: errorMessage };
@@ -179,7 +179,7 @@ export async function getBakingList() {
 
     return { 
       success: true, 
-      data: Object.values(bakingMap)
+      data: JSON.parse(JSON.stringify(Object.values(bakingMap)))
     };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -286,7 +286,7 @@ export async function addExpense(data: { label: string, amount: number, category
       }
     });
     await createAuditLog("ADD_EXPENSE", expense.id, `Expense added: ${data.label} (Rp ${data.amount})`);
-    return { success: true, data: expense };
+    return { success: true, data: JSON.parse(JSON.stringify(expense)) };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     return { success: false, error: errorMessage };

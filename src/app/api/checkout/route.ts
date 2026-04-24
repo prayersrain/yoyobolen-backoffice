@@ -3,8 +3,8 @@ import prisma from "@/lib/prisma";
 // @ts-ignore
 import midtransClient from "midtrans-client";
 
-// Initialize Midtrans Snap API
-const snap = new midtransClient.Snap({
+// Initialize Midtrans Core API
+const core = new midtransClient.CoreApi({
   isProduction: process.env.MIDTRANS_IS_PRODUCTION === "true",
   serverKey: process.env.MIDTRANS_SERVER_KEY,
   clientKey: process.env.MIDTRANS_CLIENT_KEY,
@@ -13,7 +13,7 @@ const snap = new midtransClient.Snap({
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { customerData, cartItems, totalAmount } = body;
+    const { customerData, cartItems, totalAmount, paymentMethod, selectedBank } = body;
 
     // 1. Generate Order ID upfront
     const newOrderId = `YB-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
@@ -29,17 +29,14 @@ export async function POST(req: Request) {
       },
     });
 
-    // 3. Create Snap Transaction with the generated ID
-    console.log("Creating Midtrans Snap Transaction for order:", newOrderId);
-    
-    // Add Service Fee to item_details so gross_amount matches total
+    // 3. Prepare Item Details
     const serviceFee = cartItems.length > 0 ? 5000 : 0;
     const midtransItems = [
       ...cartItems.map((item: any) => ({
         id: item.id,
         price: Math.round(item.price),
         quantity: item.quantity,
-        name: item.name.substring(0, 50) // Midtrans has name length limits
+        name: item.name.substring(0, 50)
       })),
     ];
 
@@ -52,7 +49,10 @@ export async function POST(req: Request) {
       });
     }
 
-    const transaction = await snap.createTransaction({
+    // 4. Create Core API Charge based on payment method
+    console.log(`Charging via Core API (${paymentMethod}) for order:`, newOrderId);
+    
+    let chargeParams: any = {
       transaction_details: {
         order_id: newOrderId,
         gross_amount: Math.round(totalAmount),
@@ -63,26 +63,36 @@ export async function POST(req: Request) {
         phone: customer.phone,
       },
       item_details: midtransItems,
-      callbacks: {
-        finish: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/payment/${newOrderId}`,
-        error: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/payment/${newOrderId}`,
-        pending: `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/payment/${newOrderId}`
-      }
-    });
+    };
 
-    console.log("Midtrans Response Success:", transaction.token);
+    if (paymentMethod === "qris") {
+      chargeParams.payment_type = "qris";
+    } else if (selectedBank === "mandiri") {
+      chargeParams.payment_type = "echannel";
+      chargeParams.echannel = {
+        bill_info1: "Payment for:",
+        bill_info2: `Order ${newOrderId}`
+      };
+    } else {
+      chargeParams.payment_type = "bank_transfer";
+      chargeParams.bank_transfer = {
+        bank: selectedBank || "bca"
+      };
+    }
 
-    // 4. Create Order in Database with ALL details at once
+    const transaction = await core.charge(chargeParams);
+    console.log("Midtrans Core API Response:", transaction.transaction_status);
+
+    // 5. Create Order in Database
     const order = await prisma.order.create({
       data: {
         id: newOrderId,
         customerId: customer.id,
         totalAmount: totalAmount,
         status: "PENDING",
-        channel: body.channel || "WhatsApp",
-        paymentMethod: body.paymentMethod || "QRIS",
-        snapToken: transaction.token,
-        snapUrl: transaction.redirect_url,
+        channel: body.channel || "Storefront",
+        paymentMethod: paymentMethod === "qris" ? "QRIS" : "TRANSFER",
+        paymentData: transaction as any, // Store full response for later use
         items: {
           create: cartItems.map((item: any) => ({
             productId: item.id,
@@ -93,14 +103,13 @@ export async function POST(req: Request) {
       },
     });
 
-    console.log("Order created in DB with snap details:", order.id);
+    console.log("Order created in DB with Core API details:", order.id);
 
-    // 5. Return Snap token and redirect URL
     return NextResponse.json({
       success: true,
       orderId: order.id,
-      snapToken: transaction.token,
-      snapRedirectUrl: transaction.redirect_url,
+      paymentType: paymentMethod,
+      transactionStatus: transaction.transaction_status,
     });
 
   } catch (error: any) {
